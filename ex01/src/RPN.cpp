@@ -49,10 +49,11 @@ void    RPN::pars_arg(const std::string& calcul) {
     std::stringstream ss(calcul);
 
     while (ss >> word) {
-        if (word.size() != 1)
-                throw std::runtime_error(std::string("Error : arg not good => ") + word);
-        if (std::isdigit(word[0])) {
-            _rpn.push(word[0] - '0');
+        if (std::isdigit(word[0]) || 
+            (word.size() > 1 && word[0] == '-' && std::isdigit(word[1])))
+        {
+            int value = std::stoi(word);
+            _rpn.push(value);
         }
         else if (word == "+" || word == "-" || word == "*" || word == "/")
         {
