@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 14:40:54 by mpapin            #+#    #+#             */
-/*   Updated: 2025/12/05 16:01:09 by mpapin           ###   ########.fr       */
+/*   Updated: 2025/12/22 01:15:06 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@ BitcoinExchange::BitcoinExchange(std::string file_name_args) {
 BitcoinExchange::~BitcoinExchange() {}
 
 void	BitcoinExchange::loadDatabase(const std::string& file_name) {
-	std::ifstream	db_file(file_name.c_str());
+	std::ifstream	file(file_name.c_str());
 	std::string		line;
 
-	if (!db_file.is_open()) {
+	if (!file.is_open()) {
 		std::cout << "Error: could not open file " << file_name << std::endl;
 		return;
 	}
-	std::getline(db_file, line);
+	std::getline(file, line);
 
-	while (std::getline(db_file, line))
+	while (std::getline(file, line))
 	{
 		if (line.length() < 10)
 			continue;
@@ -42,7 +42,7 @@ void	BitcoinExchange::loadDatabase(const std::string& file_name) {
 			database[date] = value;
 		}
 	}
-	db_file.close();
+	file.close();
 }
 
 float	BitcoinExchange::find_from_date(const std::string& date, bool& found)
@@ -51,7 +51,7 @@ float	BitcoinExchange::find_from_date(const std::string& date, bool& found)
 
 	if (database.empty())
 		return 0.0f;
-	std::map<std::string, float>::iterator it = database.upper_bound(date);
+	std::map<std::string, float>::iterator it = database.upper_bound(date); 
 
 	if (it == database.begin())
 		return 0.0f;
@@ -66,12 +66,12 @@ bool	BitcoinExchange::isValidDate(const std::string& date)
 	if (date.length() != 10)
 		return false;
 
-	if (date[4] != '-' || date[7] != '-')
-		return false;
-
 	for (int i = 0; i < 10; i++) {
-		if (i == 4 || i == 7)
+		if (i == 4 || i == 7) {
+			if (date[i] != '-')
+				return false;
 			continue;
+		}
 		if (!isdigit(date[i]))
 			return false;
 	}
@@ -86,8 +86,8 @@ bool	BitcoinExchange::isValidDate(const std::string& date)
 	int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	if (month == 2) {
-		bool is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-		if (is_leap)
+		bool is_leapyear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+		if (is_leapyear)
 			days_in_month[1] = 29;
 	}
 
