@@ -23,7 +23,6 @@ int main(int argc, char **argv){
         RPN rpn;
         rpn.pars_arg(argv[1]);
         std::cout << rpn.getResult() << std::endl;
-
     }
     catch (const std::exception& e)
     {
