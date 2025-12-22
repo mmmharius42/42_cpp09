@@ -11,12 +11,65 @@
 /* ************************************************************************** */
 
 #include "RPN.hpp"
+#include <sstream>
+#include <iostream> 
+#include <cctype> 
+#include <stdexcept>
+
+RPN::RPN() {}
+
+RPN::RPN(const RPN& other) : _rpn(other._rpn) {}
+
+RPN& RPN::operator=(const RPN& other)
+{
+    if (this != &other)
+        _rpn = other._rpn;
+    return *this;
+}
+
+RPN::~RPN() {}
+
+void     RPN::calcul_stack(int a, int b, const std::string& op) {
+    if (op == "+")
+        _rpn.push (a + b);
+    else if (op == "-")
+        _rpn.push (a - b);
+    else if (op == "*")
+        _rpn.push(a * b);
+    else if (op == "/")
+    {
+        if (b == 0)
+            throw std::runtime_error("Error can't divide by 0");
+        _rpn.push(a / b);
+    }
+}
 
 void    RPN::pars_arg(const std::string& calcul) {
     std::string word;
     std::stringstream ss(calcul);
 
     while (ss >> word) {
-        std::cout << "word :" << word << std::endl;
+        if (word.size() != 1)
+                throw std::runtime_error(std::string("Error : arg not good => ") + word);
+        if (std::isdigit(word[0]))
+            _rpn.push(word[0] - '0');
+        else if (word == "+" || word == "-" || word == "*" || word == "/")
+        {
+            if (_rpn.size() < 2) 
+                throw std::runtime_error("Error : operator with no number");
+            int b = _rpn.top();
+            _rpn.pop();
+            int a = _rpn.top();
+            _rpn.pop(); 
+            RPN::calcul_stack(a, b, word);
+        }
+        else
+            throw std::runtime_error("Error : only operator and number are authorized");
     }
+}
+
+int     RPN::getResult() const {
+    if (_rpn.empty())
+        throw std::runtime_error("Error : stack empty");
+    return _rpn.top();
 }

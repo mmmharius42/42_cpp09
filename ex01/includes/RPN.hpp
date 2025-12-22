@@ -12,17 +12,22 @@
 
 #ifndef RPN_HPP
 #define RPN_HPP
-#include <sstream>
 #include <stack>
 #include <string>
-#include <iostream> 
 
 
 class RPN {
     private :
-        std::stack<int> rpn;
+        std::stack<int> _rpn;
     public :
+        RPN();
+        RPN(const RPN& other);
+        RPN& operator=(const RPN& other);
+        ~RPN();
+        
         void    pars_arg(const std::string& calcul);
+        void    calcul_stack(int a, int b, const std::string& op);
+        int     getResult() const;
 };
 
 #endif
