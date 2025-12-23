@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:32:03 by mpapin            #+#    #+#             */
-/*   Updated: 2025/12/22 16:12:55 by mpapin           ###   ########.fr       */
+/*   Updated: 2025/12/23 16:17:47 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,24 @@
 #include <cstdlib>
 
 class PmergeMe {
-private:
-    std::vector<int> _vec;
-    std::deque<int> _deq;
+    private:
+        std::vector<int> _vec;
+        std::deque<int> _deq;
 
-    void validateInput(int value) const;
-    void insertionSortVector(std::vector<int>& vec);
-    void insertionSortDeque(std::deque<int>& deq);
+    public:
+        PmergeMe();
+        PmergeMe(const PmergeMe& other);
+        PmergeMe& operator=(const PmergeMe& other);
+        ~PmergeMe();
 
-public:
-    PmergeMe();
-    PmergeMe(const PmergeMe& other);
-    PmergeMe& operator=(const PmergeMe& other);
-    ~PmergeMe();
-
-    void parseArgs(int argc, char **argv);
-    void sortAndDisplay();
+        void parseArgs(int argc, char **argv);
+        void sortAndDisplay();
 };
 
+template <typename Container>
+typename Container::iterator binaryInsert(Container& c, int value, typename Container::iterator end);
+
+template <typename Container>
+void fordJohnson(Container container);
 
 #endif

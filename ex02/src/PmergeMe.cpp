@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:30:07 by mpapin            #+#    #+#             */
-/*   Updated: 2025/12/22 16:13:03 by mpapin           ###   ########.fr       */
+/*   Updated: 2025/12/23 16:17:37 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,46 +26,67 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
 
 PmergeMe::~PmergeMe() {}
 
-void PmergeMe::validateInput(int value) const {
-    if (value < 0)
-        throw std::runtime_error("Error: negative number detected");
-}
-
 void PmergeMe::parseArgs(int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         std::stringstream ss(argv[i]);
         int valeur;
-        if (ss >> valeur || ss.eof()) {
-            validateInput(valeur);
+        if (ss >> valeur && ss.eof()) {
+            if (valeur < 0)
+                throw std::runtime_error(std::string("Error: negative number detected => ") + argv[i]);
             _vec.push_back(valeur);
             _deq.push_back(valeur);
         }
         else
-            throw std::runtime_error("Error: invalid argument");
+            throw std::runtime_error(std::string("Error: invalid argument => ") + argv[i]);
     }
 }
 
-void PmergeMe::insertionSortVector(std::vector<int>& vec) {
-    for (size_t i = 1; i < vec.size(); ++i) {
-        int key = vec[i];
-        size_t j = i;
-        while (j > 0 && vec[j - 1] > key) {
-            vec[j] = vec[j - 1];
-            --j;
-        }
-        vec[j] = key;
+template <typename Container>
+typename Container::iterator binaryInsert(Container& c, int value, typename Container::iterator end)
+{
+    typename Container::iterator left = c.begin();
+    typename Container::iterator right = end;
+
+    while (left < right) {
+        typename Container::iterator mid = left + (right - left) / 2;
+        if (*mid < value)
+            left = mid + 1;
+        else
+            right = mid;
     }
+    return left;
 }
 
-void PmergeMe::insertionSortDeque(std::deque<int>& deq) {
-    for (size_t i = 1; i < deq.size(); ++i) {
-        int key = deq[i];
-        size_t j = i;
-        while (j > 0 && deq[j - 1] > key) {
-            deq[j] = deq[j - 1];
-            --j;
+template <typename Container>
+void fordJohnson(Container container) {
+    if (container.size() <= 1)
+        return;
+
+    Container mins;
+    Container maxs;
+
+    size_t i = 0;
+    for (; i + 1 < container.size(); i += 2) {
+        if (container[i] < container[i + 1]) {
+            mins.push_back(container[i]);
+            maxs.push_back(container[i + 1]);
+        } else {
+            mins.push_back(container[i + 1]);
+            maxs.push_back(container[i]);
         }
-        deq[j] = key;
+    }
+    bool hasStraggler = (i < container.size());
+    int straggler = hasStraggler ? container[i] : 0;
+    fordJohnson(maxs);
+    container = maxs;
+    container.insert(container.begin(), mins[0]);
+    for (size_t j = 1; j < mins.size(); ++j) {
+        typename Container::iterator pos = binaryInsert(container, mins[j], container.end());
+        container.insert(pos, mins[j]);
+    }
+    if (hasStraggler) {
+        typename Container::iterator pos = binaryInsert(container, straggler, container.end());
+        container.insert(pos, straggler);
     }
 }
 
@@ -88,14 +109,14 @@ void PmergeMe::sortAndDisplay() {
     std::vector<int> vecCopy = _vec;
     struct timeval vec_start, vec_end;
     gettimeofday(&vec_start, NULL);
-    insertionSortVector(vecCopy);
+    fordJohnson(vecCopy);
     gettimeofday(&vec_end, NULL);
     double timeVec = getTimeDifference(vec_start, vec_end);
 
     std::deque<int> deqCopy = _deq;
     struct timeval deq_start, deq_end;
     gettimeofday(&deq_start, NULL);
-    insertionSortDeque(deqCopy);
+    fordJohnson(deqCopy);
     gettimeofday(&deq_end, NULL);
     double timeDeq = getTimeDifference(deq_start, deq_end);
 
