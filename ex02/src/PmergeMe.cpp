@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:30:07 by mpapin            #+#    #+#             */
-/*   Updated: 2025/12/23 16:17:37 by mpapin           ###   ########.fr       */
+/*   Updated: 2026/01/08 14:49:43 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,8 @@ void fordJohnson(Container container) {
 }
 
 double getTimeDifference(const timeval& start, const timeval& end) { 
-    return (end.tv_usec - start.tv_usec);
+    return (end.tv_sec - start.tv_sec) * 1000000.0
+         + (end.tv_usec - start.tv_usec);
 }
 
 void PmergeMe::sortAndDisplay() {
