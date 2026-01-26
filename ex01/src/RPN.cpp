@@ -52,16 +52,12 @@ void    RPN::pars_arg(const std::string& calcul) {
         if (word.size() != 1)
                 throw std::runtime_error(std::string("Error : arg not good => ") + word);
         if (std::isdigit(word[0])) {
-            if (_rpn.size() >= 2)
-                throw std::runtime_error("Error : number without operation");
             _rpn.push(word[0] - '0');
         }
         else if (word == "+" || word == "-" || word == "*" || word == "/")
         {
             if (_rpn.size() < 2) 
                 throw std::runtime_error("Error : operator with no number");
-            if (_rpn.size() > 2)
-                throw std::runtime_error("Error : number without operation");
             int b = _rpn.top();
             _rpn.pop();
             int a = _rpn.top();
@@ -71,6 +67,8 @@ void    RPN::pars_arg(const std::string& calcul) {
         else
             throw std::runtime_error("Error : only operator and number are authorized");
     }
+    if (_rpn.size() != 1)
+        throw std::runtime_error("Error : more than 1 number at the end...");
 }
 
 int     RPN::getResult() const {
