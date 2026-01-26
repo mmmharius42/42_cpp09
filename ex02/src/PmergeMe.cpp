@@ -6,12 +6,13 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:30:07 by mpapin            #+#    #+#             */
-/*   Updated: 2026/01/08 14:49:43 by mpapin           ###   ########.fr       */
+/*   Updated: 2026/01/26 16:44:30 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
-
+#include "time.h"
+#include <stdio.h>
 PmergeMe::PmergeMe() {}
 
 PmergeMe::PmergeMe(const PmergeMe& other) : _vec(other._vec), _deq(other._deq) {}
@@ -58,7 +59,7 @@ typename Container::iterator binaryInsert(Container& c, int value, typename Cont
 }
 
 template <typename Container>
-void fordJohnson(Container container) {
+void fordJohnson(Container& container) {
     if (container.size() <= 1)
         return;
 
@@ -79,10 +80,35 @@ void fordJohnson(Container container) {
     int straggler = hasStraggler ? container[i] : 0;
     fordJohnson(maxs);
     container = maxs;
-    container.insert(container.begin(), mins[0]);
-    for (size_t j = 1; j < mins.size(); ++j) {
-        typename Container::iterator pos = binaryInsert(container, mins[j], container.end());
-        container.insert(pos, mins[j]);
+    if (mins.size() > 1)
+    {
+        std::vector<size_t> jacobIndices;
+        jacobIndices.push_back(0);
+        size_t a = 0, b = 1;
+        while (b < mins.size())
+        {
+            jacobIndices.push_back(b);
+            size_t tmp = b;
+            b = b + 2 * a;
+            a = tmp;
+        }
+        std::vector<size_t> uniqueJacob;
+        for (size_t i = 0; i < jacobIndices.size(); ++i) {
+            size_t idx = jacobIndices[i];
+            if (idx < mins.size() && std::find(uniqueJacob.begin(), uniqueJacob.end(), idx) == uniqueJacob.end())
+                uniqueJacob.push_back(idx);
+        }
+        for (size_t k = 0; k < uniqueJacob.size(); ++k) {
+            size_t idx = uniqueJacob[k];
+            typename Container::iterator pos = binaryInsert(container, mins[idx], container.end());
+            container.insert(pos, mins[idx]);
+        }
+        for (size_t j = 0; j < mins.size(); ++j) {
+            if (std::find(uniqueJacob.begin(), uniqueJacob.end(), j) == uniqueJacob.end()) {
+                typename Container::iterator pos = binaryInsert(container, mins[j], container.end());
+                container.insert(pos, mins[j]);
+            }
+        }
     }
     if (hasStraggler) {
         typename Container::iterator pos = binaryInsert(container, straggler, container.end());
@@ -90,10 +116,6 @@ void fordJohnson(Container container) {
     }
 }
 
-double getTimeDifference(const timeval& start, const timeval& end) { 
-    return (end.tv_sec - start.tv_sec) * 1000000.0
-         + (end.tv_usec - start.tv_usec);
-}
 
 void PmergeMe::sortAndDisplay() {
     std::cout << "Before: ";
@@ -108,19 +130,17 @@ void PmergeMe::sortAndDisplay() {
     }
 
     std::vector<int> vecCopy = _vec;
-    struct timeval vec_start, vec_end;
-    gettimeofday(&vec_start, NULL);
+    clock_t vecStart = clock();
     fordJohnson(vecCopy);
-    gettimeofday(&vec_end, NULL);
-    double timeVec = getTimeDifference(vec_start, vec_end);
+    clock_t vecEnd = clock();
+    double timeVec = (double)(vecEnd - vecStart) * 1e6 / CLOCKS_PER_SEC;
 
     std::deque<int> deqCopy = _deq;
-    struct timeval deq_start, deq_end;
-    gettimeofday(&deq_start, NULL);
+    clock_t deqStart = clock();
     fordJohnson(deqCopy);
-    gettimeofday(&deq_end, NULL);
-    double timeDeq = getTimeDifference(deq_start, deq_end);
-
+    clock_t deqEnd = clock();
+    double timeDeq = (double)(deqEnd - deqStart) * 1e6 / CLOCKS_PER_SEC;
+    
     std::cout << "After: ";
     if (vecCopy.size() > 5) {
         for (size_t i = 0; i < 4; ++i)

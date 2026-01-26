@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:32:03 by mpapin            #+#    #+#             */
-/*   Updated: 2025/12/23 16:17:47 by mpapin           ###   ########.fr       */
+/*   Updated: 2026/01/26 16:25:28 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <ctime>
 #include <iomanip>
 #include <cstdlib>
+#include <algorithm>
 
 class PmergeMe {
     private:
@@ -43,6 +44,6 @@ template <typename Container>
 typename Container::iterator binaryInsert(Container& c, int value, typename Container::iterator end);
 
 template <typename Container>
-void fordJohnson(Container container);
+void fordJohnson(Container& container);
 
 #endif
