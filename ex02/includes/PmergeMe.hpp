@@ -6,7 +6,7 @@
 /*   By: mpapin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 14:32:03 by mpapin            #+#    #+#             */
-/*   Updated: 2026/01/26 16:25:28 by mpapin           ###   ########.fr       */
+/*   Updated: 2026/01/26 17:06:21 by mpapin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <algorithm>
+#include "time.h"
 
 class PmergeMe {
     private:
